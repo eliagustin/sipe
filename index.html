@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIPE - Sistema de Permisos</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js"></script>
+<style>
+body { font-family: Arial, sans-serif; margin:0; background:#f4f4f9;}
+header { background:#007bff; color:#fff; padding:1rem; text-align:center;}
+.container { max-width:800px; margin:2rem auto; background:#fff; padding:2rem; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1);}
+input, select, button { padding:0.5rem; margin:0.5rem 0; width:100%; border:1px solid #ccc; border-radius:6px; }
+button { background:#007bff; color:#fff; border:none; cursor:pointer;}
+button:hover{background:#0056b3;}
+.logout{background:#dc3545;}
+.logout:hover{background:#a71d2a;}
+</style>
+</head>
+<body>
+<header><h1>SIPE - Sistema de Permisos</h1></header>
+<div id="root"></div>
+
+<script type="text/babel">
+
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_PROJECT_ID.firebaseapp.com",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_PROJECT_ID.appspot.com",
+  messagingSenderId: "TU_SENDER_ID",
+  appId: "TU_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+const MUNICIPIOS = ["CAMARON DE TEJEDA","CARRILLO PUERTO","COMAPA","COTAXTLA","CUITLAHUAC","HUATUSCO","IGNACIO DE LA LLAVE","PASO DE OVEJAS","PASO DEL MACHO","SOCHIAPA","SOLEDAD DE DOBLADO","TIERRA BLANCA","TLALIXCOYAN","ZENTLA"];
+const MOTIVOS = ["SALUD","MOTIVOS PERSONALES","OTRO"];
+
+function App(){
+  const [user,setUser]=React.useState(null);
+  const [role,setRole]=React.useState("");
+  const [email,setEmail]=React.useState("");
+  const [password,setPassword]=React.useState("");
+  const [formData,setFormData]=React.useState({fecha:"",municipio:"",nombre:"",apellidoP:"",apellidoM:"",telefono:"",motivo:"",otroMotivo:"",inicio:"",termino:"",archivo:null});
+  const [permisos,setPermisos]=React.useState([]);
+
+  React.useEffect(()=>{
+    const unsubscribe=auth.onAuthStateChanged(async u=>{
+      if(u){
+        setUser(u);
+        const token = await u.getIdTokenResult();
+        setRole(token.claims.role || "ENLACE");
+        db.collection("permisos").onSnapshot(snap=>{
+          setPermisos(snap.docs.map(d=>({id:d.id,...d.data()})));
+        });
+      } else { setUser(null); setRole(""); setPermisos([]);}
+    });
+    return unsubscribe;
+  },[]);
+
+  const login=()=>auth.signInWithEmailAndPassword(email,password).catch(e=>alert(e.message));
+  const logout=()=>auth.signOut();
+
+  const handleChange=(e)=>setFormData({...formData,[e.target.name]:e.target.value});
+  const handleFile=(e)=>setFormData({...formData,archivo:e.target.files[0]});
+
+  const enviarPermiso=async ()=>{
+    if(!formData.archivo) return alert("Sube un PDF");
+    let archivoRef = storage.ref().child("permisos/"+Date.now()+"_"+formData.archivo.name);
+    await archivoRef.put(formData.archivo);
+    let url = await archivoRef.getDownloadURL();
+    await db.collection("permisos").add({...formData,user:user.email,archivoURL:url,fechaSolicitud:new Date().toLocaleString()});
+    alert("Permiso enviado!");
+    setFormData({fecha:"",municipio:"",nombre:"",apellidoP:"",apellidoM:"",telefono:"",motivo:"",otroMotivo:"",inicio:"",termino:"",archivo:null});
+  };
+
+  const eliminarPermiso=async(id)=>{if(confirm("Eliminar este registro?")) await db.collection("permisos").doc(id).delete();};
+
+  const descargarExcel=()=>{
+    let csv="Usuario,Fecha,Municipio,Nombre,ApellidoP,ApellidoM,Telefono,Motivo,Inicio,Termino,ArchivoURL\n";
+    permisos.forEach(p=>{
+      csv+=`${p.user},${p.fechaSolicitud},${p.municipio},${p.nombre},${p.apellidoP},${p.apellidoM},${p.telefono},${p.motivo==="OTRO"?p.otroMotivo:p.motivo},${p.inicio},${p.termino},${p.archivoURL}\n`;
+    });
+    let blob=new Blob([csv],{type:"text/csv"});
+    let link=document.createElement("a");
+    link.href=URL.createObjectURL(blob);
+    link.download="permisos.csv";
+    link.click();
+  };
+
+  if(!user){
+    return <div className="container">
+      <h2>Iniciar Sesión</h2>
+      <input placeholder="Correo" value={email} onChange={e=>setEmail(e.target.value)}/>
+      <input type="password" placeholder="Contraseña" value={password} onChange={e=>setPassword(e.target.value)}/>
+      <button onClick={login}>Ingresar</button>
+    </div>;
+  }
+
+  if(role==="ADMIN"){
+    return <div className="container">
+      <h2>Panel Administrador</h2>
+      <button className="logout" onClick={logout}>Cerrar Sesión</button>
+      <button onClick={descargarExcel}>Descargar Excel</button>
+      <h3>Registros de Permisos</h3>
+      <ul>
+        {permisos.map(p=><li key={p.id}>{p.nombre} {p.apellidoP} {p.apellidoM} - {p.motivo==="OTRO"?p.otroMotivo:p.motivo} - <button onClick={()=>eliminarPermiso(p.id)}>Eliminar</button></li>)}
+      </ul>
+    </div>;
+  }
+
+  return <div className="container">
+    <h2>Solicitar Permiso</h2>
+    <button className="logout" onClick={logout}>Cerrar Sesión</button>
+    <input type="date" name="fecha" value={formData.fecha} onChange={handleChange}/>
+    <select name="municipio" value={formData.municipio} onChange={handleChange}><option value="">Selecciona Municipio</option>{MUNICIPIOS.map(m=><option key={m}>{m}</option>)}</select>
+    <input name="nombre" placeholder="Nombre" value={formData.nombre} onChange={handleChange}/>
+    <input name="apellidoP" placeholder="Apellido Paterno" value={formData.apellidoP} onChange={handleChange}/>
+    <input name="apellidoM" placeholder="Apellido Materno" value={formData.apellidoM} onChange={handleChange}/>
+    <input name="telefono" placeholder="Teléfono" value={formData.telefono} onChange={handleChange}/>
+    <select name="motivo" value={formData.motivo} onChange={handleChange}><option value="">Selecciona Motivo</option>{MOTIVOS.map(m=><option key={m}>{m}</option>)}</select>
+    {formData.motivo==="OTRO" && <input name="otroMotivo" placeholder="Especifique otro motivo" value={formData.otroMotivo} onChange={handleChange}/>}
+    <input type="date" name="inicio" value={formData.inicio} onChange={handleChange}/>
+    <input type="date" name="termino" value={formData.termino} onChange={handleChange}/>
+    <input type="file" accept="application/pdf" onChange={handleFile}/>
+    <button onClick={enviarPermiso}>Enviar Solicitud</button>
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
