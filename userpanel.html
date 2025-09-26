@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIPE - Solicitud de Permiso</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>SIPE Sistema de Permisos</h1>
+        <h2>Solicitud de Permiso</h2>
+        <p>Bienvenido, <span id="currentUserMunicipio"></span></p>
+        <form id="permissionForm">
+            <div class="input-group">
+                <label for="fechaSolicitud">Fecha de la Solicitud:</label>
+                <input type="date" id="fechaSolicitud" required>
+            </div>
+
+            <div class="input-group">
+                <label for="municipio">Municipio:</label>
+                <select id="municipio" required disabled>
+                    <!-- Las opciones se cargarán desde JavaScript -->
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" required>
+            </div>
+            <div class="input-group">
+                <label for="apellidoPaterno">Apellido Paterno:</label>
+                <input type="text" id="apellidoPaterno" required>
+            </div>
+            <div class="input-group">
+                <label for="apellidoMaterno">Apellido Materno:</label>
+                <input type="text" id="apellidoMaterno" required>
+            </div>
+            <div class="input-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" required pattern="[0-9]{10}" title="Por favor, ingresa un número de teléfono válido de 10 dígitos.">
+            </div>
+
+            <div class="input-group">
+                <label for="motivo">Motivo:</label>
+                <select id="motivo" required>
+                    <option value="">Selecciona un motivo</option>
+                    <option value="SALUD">SALUD</option>
+                    <option value="MOTIVOS PERSONALES">MOTIVOS PERSONALES</option>
+                    <option value="OTRO">OTRO</option>
+                </select>
+            </div>
+            <div class="input-group" id="otroMotivoGroup" style="display: none;">
+                <label for="otroMotivo">Especificar Otro Motivo:</label>
+                <input type="text" id="otroMotivo">
+            </div>
+
+            <div class="input-group">
+                <label for="diaInicio">Día de Inicio:</label>
+                <input type="date" id="diaInicio" required>
+            </div>
+            <div class="input-group">
+                <label for="diaTermino">Día de Término:</label>
+                <input type="date" id="diaTermino" required>
+            </div>
+
+            <div class="input-group">
+                <label for="cargarSolicitud">Cargar Solicitud (PDF):</label>
+                <input type="file" id="cargarSolicitud" accept=".pdf" required>
+            </div>
+
+            <button type="submit">Enviar Solicitud</button>
+        </form>
+        <button class="logout-button" onclick="logout()">Cerrar Sesión</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
