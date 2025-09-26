@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIPE - Panel de Administrador</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>SIPE Sistema de Permisos</h1>
+        <h2>Panel de Administrador</h2>
+        <p>Bienvenido, Administrador</p>
+
+        <div class="admin-actions">
+            <button onclick="downloadExcel()">Descargar Registros (Excel)</button>
+            <button class="logout-button" onclick="logout()">Cerrar Sesión</button>
+        </div>
+
+        <div class="table-container">
+            <table id="permitsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha Solicitud</th>
+                        <th>Municipio</th>
+                        <th>Nombre Completo</th>
+                        <th>Teléfono</th>
+                        <th>Motivo</th>
+                        <th>Otro Motivo</th>
+                        <th>Día Inicio</th>
+                        <th>Día Término</th>
+                        <th>Archivo PDF</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Los registros se cargarán aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
