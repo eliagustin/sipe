@@ -1,0 +1,199 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+.login-container, .container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.container {
+    max-width: 900px; /* Más ancho para el panel de admin */
+    text-align: left;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 2.2em;
+}
+
+h2 {
+    color: #34495e;
+    margin-bottom: 30px;
+    font-size: 1.6em;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+    display: inline-block;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.input-group input[type="email"],
+.input-group input[type="password"],
+.input-group input[type="text"],
+.input-group input[type="tel"],
+.input-group input[type="date"],
+.input-group select,
+.input-group input[type="file"] {
+    width: calc(100% - 20px);
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+button[type="submit"], .logout-button, .admin-actions button {
+    background-color: #3498db;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+button[type="submit"]:hover, .logout-button:hover, .admin-actions button:hover {
+    background-color: #2980b9;
+}
+
+.error-message {
+    color: #e74c3c;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.logout-button {
+    background-color: #e74c3c;
+    margin-top: 30px;
+}
+
+.logout-button:hover {
+    background-color: #c0392b;
+}
+
+/* Admin Panel Specific Styles */
+.admin-actions {
+    margin-bottom: 30px;
+    text-align: right;
+}
+
+.admin-actions button {
+    margin-left: 10px;
+    background-color: #27ae60; /* Color diferente para acciones admin */
+}
+
+.admin-actions button:hover {
+    background-color: #229954;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+#permitsTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#permitsTable th, #permitsTable td {
+    border: 1px solid #e0e0e0;
+    padding: 10px 15px;
+    text-align: left;
+    vertical-align: top;
+}
+
+#permitsTable th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    color: #444;
+}
+
+#permitsTable tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#permitsTable td button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+#permitsTable td button:hover {
+    background-color: #c0392b;
+}
+
+#permitsTable td a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+#permitsTable td a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .login-container, .container {
+        padding: 25px;
+        margin: 10px;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    h2 {
+        font-size: 1.3em;
+    }
+
+    .input-group input, .input-group select, .input-group input[type="file"] {
+        width: 100%;
+    }
+
+    button[type="submit"], .logout-button, .admin-actions button {
+        width: 100%;
+        padding: 10px;
+        font-size: 1em;
+    }
+
+    .admin-actions {
+        text-align: center;
+    }
+    .admin-actions button {
+        margin: 5px 0;
+    }
+}
